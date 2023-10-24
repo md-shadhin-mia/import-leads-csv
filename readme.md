@@ -93,4 +93,3 @@ The application will start, and you should see logs indicating that the service 
 
 To use the Leads Import Service, you can make HTTP requests to the exposed endpoints. The API documentation, if available, can be found at [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html) after the application is running. You can use tools like Swagger to explore and test the API endpoints.
 
-Customize and expand the service to suit your specific use case and requirements.
