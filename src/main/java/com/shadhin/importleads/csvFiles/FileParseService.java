@@ -11,10 +11,10 @@ import org.springframework.stereotype.Service;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -26,13 +26,21 @@ public class FileParseService {
 
     @Autowired
     private CustomerRepository customerRepository;
+
+    private Queue<Customer> customersQueue;
     @Async
     protected CompletableFuture<ImportCsv> saveImportCsv(ImportCsv importCsv) {
         try {
             Path CsvFile = fileStorageService.load(importCsv.getFilename());
             try(Stream<String> lines = Files.lines(CsvFile).skip(1)) {
-                List<Customer> customers = lines.parallel().map(this::parseLine).toList();          //file parse parallel processing
-                customerRepository.saveAll(customers);
+                final AtomicInteger counter = new AtomicInteger();
+                lines.parallel().map(this::parseLine)                                       //file parse parallel processing
+                        .collect(Collectors.groupingBy(it -> counter.getAndIncrement() / 100))
+                        .values()
+                        .parallelStream()
+                        .forEach(customers -> {
+                            customerRepository.saveAll(customers);
+                        });
             }
             importCsv.setStatus(ImportState.SUCCESS);
             //calculate duration
