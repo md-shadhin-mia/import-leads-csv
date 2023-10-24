@@ -1,0 +1,21 @@
+spring:
+  servlet:
+    multipart:
+      max-file-size: 512MB
+      max-request-size: 512MB
+  application:
+    name: Import-Leads
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/import_leads}
+    username: ${SPRING_DATASOURCE_USERNAME:root}
+    password: ${SPRING_DATASOURCE_PASSWORD:}
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: 30            # insert with bulk data with batch
+          order_inserts: true
+#    show-sql: true
