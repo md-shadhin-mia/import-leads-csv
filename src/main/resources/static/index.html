@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lead Import Service API</title>
+    
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <style>
+        /* CSS for GitHub Marker Link */
+        .github-marker {
+            position: fixed;
+            top: 50%; /* Adjust this value to position it vertically */
+            right: 20px; /* Adjust this value to position it horizontally */
+            transform: translateY(-50%);
+            z-index: 1000;
+        }
+
+        .github-marker a {
+            display: block;
+            background-color: #333;
+            padding: 10px;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            text-decoration: none;
+            color: #fff;
+        }
+
+        .github-marker img {
+            display: block;
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Navigation Section -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#home">Lead Import Service API</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse text-center" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="#documentation">Documentation</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#limitations">Limitations</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#pricing">Pricing</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero jumbotron">
+        <div class="container">
+            <h1 class="display-4">Welcome to the Lead Import Service API</h1>
+            <p class="lead">Effortlessly import and manage your leads with our powerful API.</p>
+            <a href="#pricing" class="btn btn-primary btn-lg">Get Started</a>
+        </div>
+    </section>
+
+    <!-- Documentation Section -->
+    <section id="documentation" class="content container">
+        <h2>Documentation</h2>
+        <section id="import-csv" class="documentation-section">
+            <a href="#"><h5>/import-csv (POST)</h5></a>
+            <p>The <code>/import-csv</code> endpoint provides a powerful API to facilitate the seamless import of leads generated from CSV files into your database. To ensure smooth integration, it is essential to adhere to the specific format requirements for the CSV file.</p>
+        
+            <h4>CSV Format Requirements</h4>
+            <p>The CSV file should strictly follow the format outlined below:</p>
+        
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Gender</th>
+                        <th>IP Address</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>John</td>
+                        <td>Doe</td>
+                        <td>john.doe@email.com</td>
+                        <td>+1-123-456-7890</td>
+                        <td>Male</td>
+                        <td>192.168.1.1</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Jane</td>
+                        <td>Smith</td>
+                        <td>jane.smith@email.com</td>
+                        <td>+1-987-654-3210</td>
+                        <td>Female</td>
+                        <td>10.0.0.2</td>
+                    </tr>
+                </tbody>
+            </table>
+        
+            <p>To assist with your integration, you can download additional examples by clicking the button below:</p>
+            
+            <a href="example-csv-files.zip" class="btn btn-primary">Download Examples more csv example</a>
+
+
+            <h3>Monitoring File Process Status</h3>
+            <p>Upon successful upload, the API initiates the processing of your data. During this period, the file process status is your window into the system's progress. It is crucial to check this status to ensure that your file has been imported successfully.</p>
+
+            <p>The file process status can indicate whether the import was successful or encountered any issues. Should any discrepancies arise, the system will provide relevant error messages and details to assist you in resolving any potential challenges.</p>
+
+            <p>By consistently monitoring the file process status, you can guarantee that your imported data seamlessly integrates into your database, maintaining the integrity and quality of your lead records.</p>
+            <a href="#" class="btn btn-primary">More Documentations</a>
+        </section>
+        
+        
+    </section>
+
+    <section id="simulation" class="content container">
+        <p>You can test api using this page</p>
+        <a href="#" class="btn btn-primary">Customers </a>
+    </section>
+
+    <div class="navbar-light bg-light text-center mt-4">
+    <!-- Footer Section -->
+        <footer class="container ">
+            <div class="social-media">
+                <a href="#" class="social-link">Github</a>
+                <a href="#" class="social-link">Twitter</a>
+                <a href="#" class="social-link">LinkedIn</a>
+            </div>
+            <p>&copy; 2023 Lead Import Service API</p>
+        </footer>
+    </div>
+
+
+    <!-- GitHub Marker Link -->
+        <div class="github-marker">
+            <a href="https://github.com/your-username/your-repo" target="_blank">
+                <img src="https://github.githubassets.com/images/modules/site/icons/footer/github-mark.svg" alt="GitHub" width="32" height="32">
+            </a>
+        </div>
+
+    
+
+    <!-- Include Bootstrap JS and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

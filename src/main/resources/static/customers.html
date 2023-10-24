@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Table</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+
+    <h1>Customer Table</h1>
+    <div id="alert">
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <strong>Holy guacamole!</strong> You should check in on some of those fields below.
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    </div>
+    <div>
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#uploadModal">Upload CSV</button>
+        <button type="button" class="btn btn-secondary" id="refresh">Refresh</button>
+
+    </div>
+    <table class="table table-bordered mt-3">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Gender</th>
+            <th>IP Address</th>
+        </tr>
+        </thead>
+        <tbody id="customerTableBody">
+        <!-- Customer data will be inserted here -->
+        </tbody>
+    </table>
+
+    <nav>
+        <ul class="pagination" id="pagination">
+            <!-- Pagination links will be inserted here -->
+        </ul>
+    </nav>
+</div>
+
+<!-- Upload Modal -->
+<div class="modal fade" id="uploadModal" tabindex="-1" role="dialog" aria-labelledby="uploadModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="uploadModalLabel">Upload CSV File</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" class="py-4">
+                <form id="uploadForm" enctype="multipart/form-data">
+                    <input type="file" name="file" id="csvFile" class="form-control">
+                    <button type="submit" class="btn btn-primary mt-3">Upload</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script>
+    $(document).ready(function () {
+        let currentPage = 0; // Track the current page
+        let totalPages = 0; // Track the total number of pages
+        // Upload file and get ID
+        $("#uploadForm").submit(function (e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+
+            // Show a loading dialog with SweetAlert
+            const loadingDialog = Swal.fire({
+                title: 'Uploading...',
+                html: 'Please wait while the file is being uploaded.',
+                onBeforeOpen: () => {
+                    Swal.showLoading();
+                },
+                allowOutsideClick: false,
+                showConfirmButton: false,
+            });
+
+            $.ajax({
+                url: '/import-csv',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    const importId = data.id;
+                    // Close the loading dialog
+                    loadingDialog.close();
+
+                    // Show a success message with SweetAlert
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'File Upload Success',
+                        text: `Your file has been successfully uploaded. Import ID: ${importId}`,
+                    });
+
+                    // Now that you have the import ID, you can use it to check the status.
+                    checkImportStatus(importId);
+                },
+                error: function (error) {
+                    console.error("File upload failed: ", error);
+                    // Close the loading dialog
+                    loadingDialog.close();
+
+                    // Show an error message with SweetAlert
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'File Upload Error',
+                        text: 'There was an error uploading the file. Please try again.',
+                    });
+                }
+            });
+        });
+
+        // Function to load customer data with pagination
+        function loadCustomerData(page) {
+            $.ajax({
+                url: `/customers?page=${page}`,
+                type: 'GET',
+                success: function (data) {
+                    // Clear the table body and pagination links
+                    $("#customerTableBody").empty();
+                    $("#pagination").empty();
+
+                    // Check if there is data to display
+                    if (data.content.length > 0) {
+                        // Iterate through customer data and add rows to the table
+                        $.each(data.content, function (index, customer) {
+                            $("#customerTableBody").append(
+                                `<tr>
+                                        <td>${customer.id}</td>
+                                        <td>${customer.firstName}</td>
+                                        <td>${customer.lastName}</td>
+                                        <td>${customer.email}</td>
+                                        <td>${customer.phoneNumber}</td>
+                                        <td>${customer.gender}</td>
+                                        <td>${customer.ipAddress}</td>
+                                    </tr>`
+                            );
+                        });
+
+                        // Add pagination links
+                        $("#pagination").append(
+                            `<li class="page-item ${data.first || data.totalPages == 1 ? 'disabled' : ''}" id="previousPage" ${data.first ? 'disabled' : ''}>
+                                <a class="page-link" href="#" data-page="prev">Previous</a>
+                            </li>`
+                        );
+                        $("#pagination").append(
+                            `<li class="page-item ${data.last || data.totalPages == 1 ? 'disabled' : ''}" id="nextPage">
+                                <a class="page-link" href="#" data-page="next">Next</a>
+                            </li>`
+                        );
+                        $("#pagination").append(
+                            `<li class="page-item ${data.last || data.totalPages == 1 ? 'disabled' : ''}" id="endPage" >
+                                <a class="page-link" href="#" data-page="end" >End</a>
+                            </li>`
+                        );
+                        totalPages = data.totalPages;
+                    } else {
+                        // Display a message if there are no customers
+                        $("#customerTableBody").html('<tr><td colspan="7">No customers found</td></tr>');
+                    }
+                },
+                error: function (error) {
+                    console.error("Failed to load customer data: ", error);
+                    // Show an error message with SweetAlert
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to load customer data. Please try again.',
+                    });
+                }
+            });
+        }
+
+        // Load initial customer data (page 0)
+        loadCustomerData(currentPage);
+
+        //refresh
+        $("#refresh").click(function () {
+            currentPage = 0;
+            loadCustomerData(currentPage);
+        });
+
+        // Handle pagination click
+        $("#pagination").on('click', 'a', function (e) {
+            e.preventDefault();
+            const targetPage = $(this).data('page');
+
+            if (targetPage === 'prev') {
+                if (currentPage > 0) {
+                    currentPage--;
+                }
+            } else if (targetPage === 'next') {
+                if (currentPage < totalPages - 1) {
+                    currentPage++;
+                }
+            } else if (targetPage === 'end') {
+                currentPage = totalPages - 1;
+            }
+
+            loadCustomerData(currentPage);
+        });
+        $('#alert').html(
+            `<div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <strong>Holy guacamole!</strong> You should check in on some of those fields below.
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>`
+        )
+    });
+
+    // Check the import status
+    function checkImportStatus(importId) {
+        $.ajax({
+            url: `/import-csv/${importId}`,
+            type: 'GET',
+            success: function (data) {
+                console.log(data)
+                if (data.status == 'SUCCESS') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'File Import Complete',
+                        text: 'Your file has been successfully imported. in ' + data.duration,
+                    });
+                    // You can update the UI or take other actions here.
+                } else if (data.status == 'PROCESSING') {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'File Import in Progress',
+                        text: 'The file import is still in progress. Check again later.',
+                    });
+                } else if (data.status == 'FAILURE') {
+                    console.error("File import encountered an error.");
+                    // Show an error message with SweetAlert
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'File Import Error',
+                        text: 'An error occurred during file import. Please check the status.',
+                    });
+                }
+            },
+            error: function (error) {
+                console.error("Failed to check import status: ", error);
+                // Show an error message with SweetAlert
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Status Check Error',
+                    text: 'There was an error checking the import status. Please try again later.',
+                });
+            }
+        });
+    }
+</script>
+</body>
+</html>

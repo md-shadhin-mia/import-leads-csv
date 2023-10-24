@@ -16,4 +16,10 @@ public class ExceptionHandel extends ResponseEntityExceptionHandler {
         ErrorMessage error = new ErrorMessage(404, e.getMessage());
         return ResponseEntity.status(404).body(error);
     }
+
+    @ExceptionHandler({IllegalStateException.class})
+    public ResponseEntity<ErrorMessage> handleException(IllegalStateException e) {
+        ErrorMessage error = new ErrorMessage(500, e.getMessage());
+        return ResponseEntity.status(500).body(error);
+    }
 }
