@@ -10,14 +10,6 @@
 <div class="container mt-5">
 
     <h1>Customer Table</h1>
-    <div id="alert">
-        <div class="alert alert-warning alert-dismissible fade show" role="alert">
-            <strong>Holy guacamole!</strong> You should check in on some of those fields below.
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-    </div>
     <div>
         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#uploadModal">Upload CSV</button>
         <button type="button" class="btn btn-secondary" id="refresh">Refresh</button>
@@ -68,15 +60,19 @@
     </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<!-- jQuery library -->
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!--bootstrap , popper, and jquery-->
+
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 <script>
+    let currentPage = 0; // Track the current page
+    let totalPages = 0; // Track the total number of pages
     $(document).ready(function () {
-        let currentPage = 0; // Track the current page
-        let totalPages = 0; // Track the total number of pages
+
         // Upload file and get ID
         $("#uploadForm").submit(function (e) {
             e.preventDefault();
@@ -103,12 +99,14 @@
                     const importId = data.id;
                     // Close the loading dialog
                     loadingDialog.close();
+                    $('#uploadModal').modal('hide')
 
                     // Show a success message with SweetAlert
                     Swal.fire({
                         icon: 'success',
                         title: 'File Upload Success',
                         text: `Your file has been successfully uploaded. Import ID: ${importId}`,
+
                     });
 
                     // Now that you have the import ID, you can use it to check the status.
@@ -129,66 +127,7 @@
             });
         });
 
-        // Function to load customer data with pagination
-        function loadCustomerData(page) {
-            $.ajax({
-                url: `/customers?page=${page}`,
-                type: 'GET',
-                success: function (data) {
-                    // Clear the table body and pagination links
-                    $("#customerTableBody").empty();
-                    $("#pagination").empty();
 
-                    // Check if there is data to display
-                    if (data.content.length > 0) {
-                        // Iterate through customer data and add rows to the table
-                        $.each(data.content, function (index, customer) {
-                            $("#customerTableBody").append(
-                                `<tr>
-                                        <td>${customer.id}</td>
-                                        <td>${customer.firstName}</td>
-                                        <td>${customer.lastName}</td>
-                                        <td>${customer.email}</td>
-                                        <td>${customer.phoneNumber}</td>
-                                        <td>${customer.gender}</td>
-                                        <td>${customer.ipAddress}</td>
-                                    </tr>`
-                            );
-                        });
-
-                        // Add pagination links
-                        $("#pagination").append(
-                            `<li class="page-item ${data.first || data.totalPages == 1 ? 'disabled' : ''}" id="previousPage" ${data.first ? 'disabled' : ''}>
-                                <a class="page-link" href="#" data-page="prev">Previous</a>
-                            </li>`
-                        );
-                        $("#pagination").append(
-                            `<li class="page-item ${data.last || data.totalPages == 1 ? 'disabled' : ''}" id="nextPage">
-                                <a class="page-link" href="#" data-page="next">Next</a>
-                            </li>`
-                        );
-                        $("#pagination").append(
-                            `<li class="page-item ${data.last || data.totalPages == 1 ? 'disabled' : ''}" id="endPage" >
-                                <a class="page-link" href="#" data-page="end" >End</a>
-                            </li>`
-                        );
-                        totalPages = data.totalPages;
-                    } else {
-                        // Display a message if there are no customers
-                        $("#customerTableBody").html('<tr><td colspan="7">No customers found</td></tr>');
-                    }
-                },
-                error: function (error) {
-                    console.error("Failed to load customer data: ", error);
-                    // Show an error message with SweetAlert
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Failed to load customer data. Please try again.',
-                    });
-                }
-            });
-        }
 
         // Load initial customer data (page 0)
         loadCustomerData(currentPage);
@@ -228,28 +167,104 @@
         )
     });
 
+    // Function to load customer data with pagination
+    function loadCustomerData(page) {
+        $.ajax({
+            url: `/customers?page=${page}`,
+            type: 'GET',
+            success: function (data) {
+                // Clear the table body and pagination links
+                $("#customerTableBody").empty();
+                $("#pagination").empty();
+
+                // Check if there is data to display
+                if (data.content.length > 0) {
+                    // Iterate through customer data and add rows to the table
+                    $.each(data.content, function (index, customer) {
+                        $("#customerTableBody").append(
+                            `<tr>
+                                        <td>${customer.id}</td>
+                                        <td>${customer.firstName}</td>
+                                        <td>${customer.lastName}</td>
+                                        <td>${customer.email}</td>
+                                        <td>${customer.phoneNumber}</td>
+                                        <td>${customer.gender}</td>
+                                        <td>${customer.ipAddress}</td>
+                                    </tr>`
+                        );
+                    });
+
+                    // Add pagination links
+                    $("#pagination").append(
+                        `<li class="page-item ${data.first || data.totalPages == 1 ? 'disabled' : ''}" id="previousPage" ${data.first ? 'disabled' : ''}>
+                                <a class="page-link" href="#" data-page="prev">Previous</a>
+                            </li>`
+                    );
+                    $("#pagination").append(
+                        `<li class="page-item ${data.last || data.totalPages == 1 ? 'disabled' : ''}" id="nextPage">
+                                <a class="page-link" href="#" data-page="next">Next</a>
+                            </li>`
+                    );
+                    $("#pagination").append(
+                        `<li class="page-item ${data.last || data.totalPages == 1 ? 'disabled' : ''}" id="endPage" >
+                                <a class="page-link" href="#" data-page="end" >End</a>
+                            </li>`
+                    );
+                    totalPages = data.totalPages;
+                } else {
+                    // Display a message if there are no customers
+                    $("#customerTableBody").html('<tr><td colspan="7">No customers found</td></tr>');
+                }
+            },
+            error: function (error) {
+                console.error("Failed to load customer data: ", error);
+                // Show an error message with SweetAlert
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to load customer data. Please try again.',
+                });
+            }
+        });
+    }
+
     // Check the import status
+    window.fileProcesingDialoag = null;
     function checkImportStatus(importId) {
+        if(window.fileProcesingDialoag == null){
+            console.log("checkImportStatus");
+            fileProcesingDialoag = Swal.fire({
+                title: 'File is processing...',
+                html: 'Please wait while the file is being importing.',
+                onBeforeOpen: () => {
+                    Swal.showLoading();
+                },
+                allowOutsideClick: false,
+                showConfirmButton: false,
+            });
+        }
+
         $.ajax({
             url: `/import-csv/${importId}`,
             type: 'GET',
             success: function (data) {
-                console.log(data)
+                // console.log(data);
                 if (data.status == 'SUCCESS') {
+                    window.fileProcesingDialoag.close();
+                    window.fileProcesingDialoag == null;
                     Swal.fire({
                         icon: 'success',
                         title: 'File Import Complete',
-                        text: 'Your file has been successfully imported. in ' + data.duration,
+                        text: 'File import completed successfully. Duration : ' + data.duration,
                     });
+                    loadCustomerData(0);
                     // You can update the UI or take other actions here.
                 } else if (data.status == 'PROCESSING') {
-                    Swal.fire({
-                        icon: 'info',
-                        title: 'File Import in Progress',
-                        text: 'The file import is still in progress. Check again later.',
-                    });
+                    console.log(data.status);
+                    setTimeout(()=>checkImportStatus(importId), 1000)
                 } else if (data.status == 'FAILURE') {
-                    console.error("File import encountered an error.");
+                    window.fileProcesingDialoag.close();
+                    window.fileProcesingDialoag == null;
                     // Show an error message with SweetAlert
                     Swal.fire({
                         icon: 'error',
@@ -259,7 +274,8 @@
                 }
             },
             error: function (error) {
-                console.error("Failed to check import status: ", error);
+                window.fileProcesingDialoag.close();
+                window.fileProcesingDialoag == null;
                 // Show an error message with SweetAlert
                 Swal.fire({
                     icon: 'error',
