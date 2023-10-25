@@ -1,5 +1,6 @@
 package com.shadhin.importleads.csvFiles;
 
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,8 +15,8 @@ public class ImportCsvController {
     }
 
     //uploading csv file
-    @PostMapping
-    public ImportCsv uploadCsvFile(@RequestParam MultipartFile file) {
+    @PostMapping(consumes =  MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ImportCsv uploadCsvFile(@RequestParam("file") MultipartFile file) {
         return importCsvService.uploadCsvFile(file);
     }
 
