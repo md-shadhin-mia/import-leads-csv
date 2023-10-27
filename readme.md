@@ -154,3 +154,7 @@ If status is `FAILURE` you may give wrong file or format of csv file. csv format
 |----|------------|-----------|--------------------|------------------|--------|----------------|
 | 1  | Farah,     | Thomas    | fgomez0@rediff.com | +86 601 627 2905 | Female | 70.102.65.201  |
 | 8  | Ginam      | Flington  | gbustard7@i2i.jp   | +55 733 100 6405 | Male   | 40.195.117.180 |
+
+
+##  Result 
+I test application with upload 1 million leads in localhost computer Core i5 CPU 8GB ram it takes time almost `5 minutes` to process
